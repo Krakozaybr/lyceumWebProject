@@ -1,0 +1,51 @@
+{% macro input_field(field, id='', downtext='') %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {% if id %}
+            {{ field(id=id, class='form-control') }}
+        {% else %}
+            {{ field(class='form-control', value=value) }}
+        {% endif %}
+        {% if downtext != '' %}
+            <small class="form-text text-muted" id="{{ id }}_downtext">{{ downtext }}</small>
+        {% endif %}
+        {% for err in field.errors %}
+            <div class="invalid-feedback">
+                {{ err }}
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+{% macro checkbox(field, id='') %}
+    <div class="form-group">
+        <div class="form-check">
+            {% if id %}
+                {{ field(id=id, class='form-check-input', type="checkbox") }}
+            {% else %}
+                {{ field(class='form-check-input', type="checkbox") }}
+            {% endif %}
+            <label class="form-check-label" for="invalidCheck3">
+                {{ field.label }}
+            </label>
+            {% for err in field.errors %}
+                <div class="invalid-feedback">
+                    {{ err }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+{% macro submit(field) %}
+    {{ field(class='btn btn-primary', type='submit', **kwargs) }}
+{% endmacro %}
+{% macro file_field(field) %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field(class='form-control-file') }}
+        {% for err in field.errors %}
+            <div class="invalid-feedback">
+                {{ err }}
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}

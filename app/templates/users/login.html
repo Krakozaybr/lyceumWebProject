@@ -1,0 +1,20 @@
+{% extends 'users/auth_base.html' %}
+{% import 'macroses.html' as utils %}
+{% block auth_content %}
+
+    <h2>Авторизация</h2>
+    <form method="post">
+
+        {{ form.hidden_tag() }}
+
+        {{ utils.input_field(form.login, 'login') }}
+        {{ utils.input_field(form.password, 'password') }}
+        {{ utils.checkbox(form.remember_me, 'remember_me') }}
+        <div class="dflex flex-direction-row">
+            {{ utils.submit(form.submit) }}
+            <a href="/register" class="btn btn-secondary">Зарегистрироваться</a>
+        </div>
+
+    </form>
+
+{% endblock %}
