@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container col-9 d-flex my-3 p-5 align-items-center justify-content-center flex-column">
+
+        <div class="row w-100 justify-content-between">
+            <div class="col-12 mb-2">
+                <h2 class="text-start">Сундуки</h2>
+            </div>
+            <div class="col-12 mb-2">
+                <a href="/chest/create" class="btn btn-primary">Создать</a>
+            </div>
+            {% for chest in chests %}
+                <div class="col-6 py-1 px-3">
+                    <div class="container my-2 bg-light shadow p-5 d-flex flex-column">
+                        <div class="container mb-2 d-flex flex-row">
+                            <img src="{{ chest.img_url }}" width="80" height="80"
+                                 class="d-inline-block align-center"
+                                 alt="">
+                            <div class="container">
+                                <h4>{{ chest.name }}</h4>
+                                <p class="text-info">ID: {{ chest.id }}</p>
+                                <p class="text-info">Предметов: {{ items_count_min }}-{{ items_count_max }}</p>
+                                <p class="text-info">Монет: {{ coins_min }}-{{ coins_max }}</p>
+                                <p class="text-wrap text-break">{{ chest.description }}</p>
+                            </div>
+                        </div>
+                        {% if current_user.is_staff %}
+                            <div class="container d-flex flex-row">
+                                <a class="btn btn-success" href="{{ chest.url }}">Изменить</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

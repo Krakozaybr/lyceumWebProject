@@ -3,13 +3,16 @@ from datetime import datetime
 from flask import url_for
 from sqlalchemy import Integer, String, Column, DateTime, Boolean
 
+from app.models.abstract import Model
 from app.models.core import Serializable, format_date
 from app.models.db_session import SqlAlchemyBase
 from flask_login.mixins import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app.utils.utils import img_url
 
-class User(SqlAlchemyBase, UserMixin, Serializable):
+
+class User(SqlAlchemyBase, UserMixin, Model):
 
     __tablename__ = "users"
 
@@ -43,9 +46,8 @@ class User(SqlAlchemyBase, UserMixin, Serializable):
 
     @property
     def img_url(self):
-        img = self.avatar or self.DEFAULT_AVATAR
-        return url_for("static", filename=f"images/{img}")
+        return img_url(self.avatar or self.DEFAULT_AVATAR)
 
     @property
     def preview_url(self):
-        return f'/users/{self.id}'
+        return f"/users/{self.id}"

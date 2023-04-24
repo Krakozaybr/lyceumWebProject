@@ -1,0 +1,38 @@
+{% extends 'form_base.html' %}
+{% import 'macroses.html' as macroses %}
+
+{% block form_content %}
+    <h3 class="mb-3">Карточка товара</h3>
+    {{ macroses.item_type_card(product.item_type) }}
+    <h3 class="mb-2">Описание продавца</h3>
+    <p>{{ product.user_description }}</p>
+    <h3 class="mb-2">Стоимость</h3>
+    <p>Количество: {{ product.count }}</p>
+    <p>Цена за единицу: {{ product.price }}</p>
+    <form method="post" class="mb-4">
+        {{ form.hidden_tag() }}
+        {{ macroses.input_field(form.count, id='count_input', downtext=' ') }}
+        <div class="text-white bg-success p-2 rounded mb-2">Стоимость: <span id="total">0</span>₽</div>
+        {{ macroses.submit(form.submit, id='submit_btn') }}
+        <a href="/products" class="btn btn-secondary">Все товары</a>
+    </form>
+    <h3 class="mb-3">Комментарии</h3>
+    <form method="post" class="mb-4">
+        <h4>Добавить комментарий</h4>
+        {{ comment_form.hidden_tag() }}
+        {{ macroses.input_field(comment_form.text) }}
+        {{ macroses.submit(comment_form.submit) }}
+        <a href="/comments/{{ product.id }}" class="btn btn-secondary">Все комментарии</a>
+    </form>
+    {% for comment in comments %}
+        <div class="p-3 bg-light shadow-lg my-2">
+            {{ macroses.comment_card(comment) }}
+        </div>
+    {% endfor %}
+    <script>
+        const maxCount = {{ product.count }};
+        const currentBill = {{ current_user.bill }};
+        const price = {{ product.price }};
+    </script>
+    <script src="{{ url_for('static', filename='js/product_view.js') }}"></script>
+{% endblock %}

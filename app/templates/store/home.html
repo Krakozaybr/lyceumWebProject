@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% import 'macroses.html' as macroses %}
+
+{% block content %}
+    <div class="container col-8">
+        <div class="container bg-light shadow-lg my-3 p-3">
+            <h2>Сундуки</h2>
+            <hr class="m-2">
+            <div class="row d-flex">
+                {% for chest in chests %}
+                    <div class="col-6 p-3">
+                        <div class="bg-dark shadow p-3 rounded">
+                            <h4 class="text-light">{{ chest.name|capitalize }}</h4>
+                            <div class="d-flex flex-row">
+                                <img src="{{ chest.img_url }}" alt="" class="d-inline-block align-center rounded"
+                                     width="130" height="120">
+                                <p class="mx-2 text-light text-wrap text-break">{{ chest.description }}</p>
+                            </div>
+                            <div class="d-flex flex-row mt-2 align-items-end">
+                                {% if current_user.is_authenticated %}
+
+                                    <button class="btn btn-warning chest-open"
+                                            data-price="{{ chest.price }}"
+                                            data-chest-id="{{ chest.id }}">Открыть
+                                    </button>
+
+                                {% endif %}
+                                <div class="alert alert-success chest-price my-0 py-2 ml-auto"
+                                     data-price="{{ chest.price }}">
+                                    Цена: {{ chest.price }}₽
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container bg-light shadow-lg my-3 p-3">
+            <h2 class="mb-3">Товары</h2>
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-md-6 p-2">
+                        <div class="bg-light shadow-lg p-3">
+                            {{ macroses.product_card(product) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container bg-light shadow-lg my-3 p-3">
+            <h2>Недавние комментарии</h2>
+            {% if comments %}
+                <div class="row">
+                    {% for comment in comments %}
+                        <div class="col-md-6 my-3">
+                            <div class="shadow-lg bg-light p-3">
+                                <h4>Комментарий к
+                                    <a href="{{ comment.target.url }}" class="text-reset text-decoration-none">
+                                        <span class="text-info">{{ comment.target.item_type.name }}</span>
+                                    </a>
+                                </h4>
+                                {{ macroses.comment_card(comment) }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h4>Пока нет комментариев</h4>
+            {% endif %}
+        </div>
+    </div>
+    {% if current_user.is_authenticated %}
+        <script>
+            let current_bill = {{ current_user.bill }};
+        </script>
+        <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    {% endif %}
+{% endblock %}

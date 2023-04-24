@@ -1,0 +1,31 @@
+{% import 'macroses.html' as utils %}
+
+{% macro chest_fields(form, postfix='') %}
+
+{#    name#}
+{#    description#}
+{#    image#}
+{#    price#}
+{#    items_count_min#}
+{#    items_count_max#}
+{#    coins_min#}
+{#    coins_max#}
+{#    item_types#}
+
+    {% if form.id %}
+        <p class="text text-secondary mt-3">Id: {{ form.id.data }}</p>
+    {% endif %}
+
+    {{ utils.input_field(form.name, id='chest_' + postfix + '_name') }}
+    {{ utils.input_field(form.description, id='chest_' + postfix + '_description') }}
+    {{ utils.file_field(form.image) }}
+    {{ utils.input_field(form.price, id='chest_' + postfix + '_price') }}
+    {{ utils.input_field(form.items_count_min, id='chest_' + postfix + '_items_count_min') }}
+    {{ utils.input_field(form.items_count_max, id='chest_' + postfix + '_items_count_max') }}
+    {{ utils.input_field(form.coins_min, id='chest_' + postfix + '_coins_min') }}
+    {{ utils.input_field(form.coins_max, id='chest_' + postfix + '_coins_max') }}
+    {{ utils.input_field(form.item_types, id='chest_' + postfix + '_item_types') }}
+
+    {{ utils.submit(form.submit) }}
+
+{% endmacro %}

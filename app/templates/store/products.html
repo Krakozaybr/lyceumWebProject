@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% import 'macroses.html' as macroses %}
+{% block title %}Товары{% endblock %}
+
+{% block content %}
+    <div class="col-8 row">
+        <div class="col-12 p-2">
+            <div class="bg-light shadow-lg p-4">
+                <h2 class="m-0 p-0">Товары</h2>
+            </div>
+        </div>
+        {% for product in products %}
+            <div class="col-md-6 p-2">
+                <div class="bg-light shadow-lg p-3">
+                    {{ macroses.product_card(product) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

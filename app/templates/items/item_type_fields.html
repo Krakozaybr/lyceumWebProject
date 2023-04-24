@@ -1,0 +1,15 @@
+{% import 'macroses.html' as utils %}
+
+{% macro item_type_fields(form, postfix='') %}
+
+    {% if form.id %}
+        <p class="text text-secondary mt-3">Id: {{ form.id.data }}</p>
+    {% endif %}
+
+    {{ utils.input_field(form.name, id='item_type_' + postfix + '_name') }}
+    {{ utils.input_field(form.description, id='item_type_' + postfix + '_description') }}
+    {{ utils.file_field(form.image) }}
+    {{ utils.input_field(form.rare, id='item_type_' + postfix + '_rare') }}
+    {{ utils.submit(form.submit) }}
+
+{% endmacro %}

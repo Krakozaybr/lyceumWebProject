@@ -1,32 +1,36 @@
+import datetime
+
 from sqlalchemy import (
     Integer,
     String,
     Column,
     orm,
     ForeignKey,
-    Float,
     DateTime,
-    Boolean,
 )
 
-from .core import Serializable, format_date
+from .abstract import Model
+from .core import format_date
 from .db_session import SqlAlchemyBase
 
 
-class Product(SqlAlchemyBase, Serializable):
+class Product(Model, SqlAlchemyBase):
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_description = Column(String)
-    price = Column(Float)
-    created_at = Column(DateTime)
+    price = Column(Integer)
+    created_at = Column(DateTime, default=datetime.datetime.now)
     user_id = Column(Integer, ForeignKey("users.id"))
-    is_closed = Column(Boolean)
     count = Column(Integer)
     item_type_id = Column(Integer, ForeignKey("item_types.id"))
 
     item_type = orm.relationship("ItemType")
-    user = orm.relationship("User", back_populates="products")
+    user = orm.relationship("User", backref="products")
+
+    @property
+    def url(self):
+        return f"/product/{self.id}"
 
     def to_json(self):
         return {

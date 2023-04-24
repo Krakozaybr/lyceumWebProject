@@ -1,0 +1,45 @@
+{% extends 'form_base.html' %}
+{% import 'macroses.html' as macroses %}
+
+{% block form_content %}
+    <h2>Продукт</h2>
+    {% if form.id %}
+        <p class="text-secondary">ID: {{ form.id.data }}</p>
+    {% endif %}
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        {{ macroses.input_field(form.description, id='description_input') }}
+        {{ macroses.input_field(form.price, id='price_input', downtext=' ') }}
+        {{ macroses.input_field(form.count, id='count_input', downtext=' ') }}
+        {{ macroses.submit(form.submit, id="submit") }}
+    </form>
+    <div class="rounded bg-success text-white p-2 mt-2">
+        <p class="p-0 m-0">Итого: <span id="total"></span>₽</p>
+    </div>
+    <div class="d-flex flex-row mt-2">
+        <a href="/products" class="btn btn-secondary">Все товары</a>
+        {% if form.id %}
+            <button class="btn btn-danger ml-auto" id="product_delete">Удалить</button>
+            <script>
+                const btn = $("#product_delete")
+                btn.on('click', () => {
+                    $.ajax({
+                        url: '/api/delete_product/{{ form.id.data }}',
+                        method: 'DELETE',
+                        dataType: "json",
+                        contentType: 'application/json',
+                        data: JSON.stringify({}),
+                        success: data => {
+                            window.location.href = '/products';
+                        },
+                    })
+                })
+            </script>
+        {% endif %}
+    </div>
+    <script>
+        const maxCount = {{ max_count }};
+    </script>
+    <script src="{{ url_for('static', filename='js/product.js') }}"></script>
+{% endblock %}

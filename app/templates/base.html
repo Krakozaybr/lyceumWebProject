@@ -18,15 +18,25 @@
         Megamarket
     </a>
 
-    {% if current_user.is_authenticated %}
-        <a href="/profile" class="ml-auto">
-            <img src="{{ current_user.img_url }}" width="30" height="30" class="d-inline-block align-top"
-                 alt="">
-        </a>
-        <a class="btn btn-danger-outline" href="/logout">
-            <img src="{{ url_for('static', filename='images/logout.png') }}" width="30" height="30"
-                 class="d-inline-block align-top" alt="">
-        </a>
+    {% if current_user and current_user.is_authenticated %}
+        <div class="ml-auto d-flex align-items-center">
+            {% if current_user.is_staff %}
+                <a class="btn btn-primary mx-2" href="/chests">Сундуки</a>
+                <a class="btn btn-primary mx-2" href="/item_types">Типы предметов</a>
+            {% endif %}
+            <a href="/products" class="btn btn-secondary mx-2">Товары</a>
+            <a href="/transactions" class="btn btn-secondary mx-2">Транзакции</a>
+            <a class="btn btn-info ml-2 mr-3" href="/inventory">Мои предметы</a>
+            <div class="text-success mr-2">Баланс: <span id="balance">{{ current_user.bill }}₽</span></div>
+            <a href="/profile">
+                <img src="{{ current_user.img_url }}" width="30" height="30" class="d-inline-block align-top"
+                     alt="">
+            </a>
+            <a class="btn btn-danger-outline" href="/logout">
+                <img src="{{ url_for('static', filename='images/logout.png') }}" width="30" height="30"
+                     class="d-inline-block align-top" alt="">
+            </a>
+        </div>
     {% else %}
 
         <p>
@@ -48,7 +58,7 @@
 
 
 <div class="container-fluid dflex justify-content-center">
-    <div class="row">
+    <div class="row justify-content-center">
         {% block content %}{% endblock %}
     </div>
 </div>

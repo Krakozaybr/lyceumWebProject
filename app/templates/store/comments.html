@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% import 'macroses.html' as macroses %}
+
+{% block title %}Комментарии{% endblock %}
+{% block content %}
+    <div class="col-8 row">
+        <div class="col-12 p-3">
+            <div class="bg-light shadow-lg p-4">
+                <h2>Комментарии</h2>
+            </div>
+        </div>
+        <div class="col-12 p-3">
+            <a href="/product/{{ product_id }}" class="btn btn-secondary">Назад</a>
+        </div>
+        {% for comment in comments %}
+            <div class="col-md-6 p-3">
+                <div class="bg-light shadow-lg p-4  ">
+                    {{ macroses.comment_card(comment) }}
+                    {% if comment.user_id == current_user.id or current_user.is_staff %}
+                        <button class="btn btn-danger comment-delete" data-comment-id="{{ comment.id }}">Удалить</button>
+                        <script>
+                            $(".comment-delete").on('click', function () {
+                                $.ajax({
+                                    url: '/api/delete_comment/' + $(this).data('comment-id'),
+                                    method: 'DELETE',
+                                    dataType: "json",
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({}),
+                                    success: data => {
+                                        window.location.reload();
+                                    },
+                                })
+                            })
+                        </script>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

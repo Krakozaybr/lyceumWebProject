@@ -1,0 +1,10 @@
+{% extends 'form_base.html' %}
+{% import 'items/items_list.html' as items_macro %}
+
+{% block form_content %}
+    <h2>Инвентарь</h2>
+    {% macro link(item_type) %}
+        <a href="/create_product/{{ item_type.id }}" class="btn btn-primary">Продать</a>
+    {% endmacro %}
+    {{ items_macro.item_list(items, link) }}
+{% endblock %}

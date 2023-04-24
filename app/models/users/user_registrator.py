@@ -26,8 +26,8 @@ class LoginValidator(Validator):
     @staticmethod
     def login_available(login: str):
         if login:
-            session = create_session()
-            return session.query(User).filter(User.login == login).first() is None
+            with create_session() as session:
+                return session.query(User).filter(User.login == login).first() is None
         return False
 
     @staticmethod
@@ -93,9 +93,9 @@ class UserRegistrator:
         user.set_password(self.password)
         user.login = self.login
 
-        session = create_session()
-        session.add(user)
-        session.commit()
+        with create_session() as session:
+            session.add(user)
+            session.commit()
 
         return user.id
 

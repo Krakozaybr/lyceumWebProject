@@ -1,0 +1,32 @@
+{% extends 'form_base.html' %}
+{% import 'items/items_list.html' as items_macro %}
+{% import 'macroses.html' as macroses %}
+
+{% block form_content %}
+    <div class="p-2">
+        <h2>Транзакция</h2>
+        <div class="d-flex flex-row align-items-center py-3 px-2 w-100">
+            {{ macroses.user_icon(transaction.from_user) }}
+            <div class="d-flex flex-column">
+                <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="" width="50"
+                     class="d-inline-block mx-5">
+                <p class="text-info text-center">Предметы</p>
+            </div>
+            {{ macroses.user_icon(transaction.to_user) }}
+        </div>
+        <div class="d-flex flex-row align-items-center py-3 px-2 w-100">
+            {{ macroses.user_icon(transaction.from_user) }}
+            <div class="d-flex flex-column">
+                <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="" width="50"
+                     class="d-inline-block mx-5" {% if transaction.money > 0 %}style="transform: rotate(180deg)"{% endif %}>
+                <p class="text-success text-center">{{ transaction.money|abs }}₽</p>
+            </div>
+            {{ macroses.user_icon(transaction.to_user) }}
+        </div>
+    </div>
+    <h3>Предметы</h3>
+    {{ items_macro.item_list(transaction.items_dict) }}
+    <div class="d-flex flex-row my-2">
+        <a href="/" class="btn btn-success">На главную</a>
+    </div>
+{% endblock %}

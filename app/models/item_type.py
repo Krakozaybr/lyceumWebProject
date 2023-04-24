@@ -4,12 +4,15 @@ from sqlalchemy import (
     String,
     Column,
 )
+from sqlalchemy.orm import relationship
 
+from .abstract import Model
 from .core import Serializable
 from .db_session import SqlAlchemyBase
+from ..utils.utils import img_url
 
 
-class ItemType(SqlAlchemyBase, Serializable):
+class ItemType(Model, SqlAlchemyBase):
     __tablename__ = "item_types"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -17,6 +20,22 @@ class ItemType(SqlAlchemyBase, Serializable):
     description = Column(String)
     image = Column(String)
     rare = Column(Integer)
+
+    def create(self):
+        from .item import Item
+
+        item = Item()
+        item.item_type = self
+
+        return item
+
+    @property
+    def url(self):
+        return f"/item_type/{self.id}"
+
+    @property
+    def img_url(self):
+        return img_url(self.image)
 
     def to_json(self):
         return {

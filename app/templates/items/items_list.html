@@ -1,0 +1,21 @@
+{% import 'macroses.html' as macroses %}
+
+{% macro item_list(items, func=None) %}
+    <div class="d-flex flex-column">
+        {% for item_type, count in items.items() %}
+            <div class="container my-2 p-0 rounded bg-light shadow d-flex flex-column w-100">
+                <div class="p-5">
+                    {{ macroses.item_type_card(item_type) }}
+                </div>
+                <div class="w-100 bg-info p-2 d-flex align-items-center">
+                    <p class="text-white m-0">Количество: {{ count }}</p>
+                    {% if func %}
+                        <div class="ml-auto">
+                            {{ func(item_type) }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}

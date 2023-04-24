@@ -1,0 +1,13 @@
+{% macro item_type_card(item_type, footer=None) %}
+    <div class="container mb-2 d-flex flex-row">
+        <img src="{{ item_type.img_url }}" width="80" height="80"
+             class="d-inline-block align-center"
+             alt="">
+        <div class="container">
+            <h4>{{ item_type.name }}</h4>
+            <p class="text-info">ID: {{ item_type.id }}</p>
+            <p class="text-warning">Ценность: {{ item_type.rare }}</p>
+            <p class="text-wrap text-break">{{ item_type.description }}</p>
+        </div>
+    </div>
+{% endmacro %}

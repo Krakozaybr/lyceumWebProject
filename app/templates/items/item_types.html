@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% import 'macroses.html' as macroses %}
+
+
+{% block content %}
+    <div class="container col-9 d-flex my-3 p-5 align-items-center justify-content-center flex-column">
+
+        <div class="row w-100 justify-content-between">
+            <div class="col-12 mb-2">
+                <h2 class="text-start">Типы предметов</h2>
+            </div>
+            <div class="col-12 mb-2">
+                <a href="/item_type/create" class="btn btn-primary">Создать</a>
+            </div>
+            {% for item_type in item_types %}
+                <div class="col-6 py-1 px-3">
+                    <div class="container my-2 bg-light shadow p-5 d-flex flex-column">
+                        {{ macroses.item_type_card(item_type) }}
+                        {% if current_user.is_staff %}
+                            <div class="container d-flex flex-row">
+                                <a class="btn btn-success" href="{{ item_type.url }}">Изменить</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

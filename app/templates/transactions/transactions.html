@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Транзакции{% endblock %}
+{% block content %}
+    <div class="col-8 bg-light shadow-lg p-4">
+        <h2 class="mb-4 p-0">Транзакции</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Дата</th>
+                <th scope="col">От кого</th>
+                <th scope="col">К кому</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Ссылка</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <th scope="row">{{ transaction.created_at|date }}</th>
+                    <td>
+                        {% if transaction.from_user %}
+                            <a href="{{ transaction.from_user.preview_url }}"
+                               class="text-reset text-decoration-none">
+                            <span class="text-info">
+                                {{ transaction.from_user.login }}
+                            </span>
+                            </a>
+                        {% else %}
+                            Сервер
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if transaction.to_user %}
+                            <a href="{{ transaction.to_user.preview_url }}"
+                               class="text-reset text-decoration-none">
+                            <span class="text-info">
+                                {{ transaction.to_user.login }}
+                            </span>
+                            </a>
+                        {% else %}
+                            Сервер
+                        {% endif %}
+                    </td>
+                    <td class="{% if transaction.to_user_id == current_user.id and transaction.money > 0 %}text-danger{% else %}text-success{% endif %}">
+                        {{ transaction.money }}₽
+                    </td>
+                    <td><a href="{{ transaction.url }}" class="btn btn-info">Подробнее</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

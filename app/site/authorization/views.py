@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import (
     LoginManager,
     login_user,
@@ -23,10 +23,11 @@ from app.models.users.user import User
 from ...models.users.user_registrator import UserRegistrator, PasswordValidator
 import uuid
 
-from ...utils.utils import allowed_file, get_extension
+from ...utils.utils import delete_img, get_image, ImageFormatException
 
 blueprint = Blueprint("authorization", __name__, template_folder=settings.TEMPLATES_DIR)
 login_manager = LoginManager()
+login_manager.login_view = "site.authorization.login"
 current_user: User
 
 
@@ -35,19 +36,21 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        session = create_session()
+        with create_session() as session:
 
-        user = session.query(User).filter(User.login == form.login.data).first()
+            user = session.query(User).filter(User.login == form.login.data).first()
 
-        if user is not None and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
-            return redirect("/")
-        return render_template(
-            "users/login.html",
-            message="Неверный логин или пароль",
-            title="Авторизация",
-            form=form,
-        )
+            if user is not None and user.check_password(form.password.data):
+                login_user(user, remember=form.remember_me.data)
+
+                return redirect("/")
+
+            return render_template(
+                "users/login.html",
+                message="Неверный логин или пароль",
+                title="Авторизация",
+                form=form,
+            )
     return render_template("users/login.html", title="Авторизация", form=form)
 
 
@@ -74,72 +77,70 @@ def profile():
     change_description_form = ChangeDescriptionForm()
     change_password_form = ChangePasswordForm()
 
-    data = {
-        "avatar_form": avatar_form,
-        "change_description_form": change_description_form,
-        "change_password_form": change_password_form,
-        "description": current_user.description,
-    }
+    with create_session() as session:
 
-    data_changed = False
+        data = {
+            "avatar_form": avatar_form,
+            "change_description_form": change_description_form,
+            "change_password_form": change_password_form,
+            "description": current_user.description,
+        }
 
-    if avatar_form.validate_on_submit():
+        data_changed = False
 
-        data_changed = True
+        if avatar_form.validate_on_submit():
 
-        if not allowed_file(
-            avatar_form.image.data.filename, settings.ALLOWED_IMAGES_EXTENSIONS
-        ):
-            return render_template(
-                "users/profile.html", image_error="Расширение не поддерживается", **data
+            data_changed = True
+
+            try:
+                filename = get_image(avatar_form.image.data)
+            except ImageFormatException:
+                return render_template(
+                    "users/profile.html",
+                    image_error="Расширение не поддерживается",
+                    **data
+                )
+
+            if current_user.avatar:
+                delete_img(current_user.avatar)
+
+            current_user.avatar = filename
+
+        if change_password_form.validate_on_submit():
+
+            data_changed = True
+
+            if not current_user.check_password(change_password_form.password.data):
+                return render_template(
+                    "users/profile.html",
+                    password_error="Указан неверный текущий пароль",
+                    **data
+                )
+
+            password_validator = PasswordValidator(
+                password=change_password_form.new_password.data
             )
 
-        filename = str(uuid.uuid4())
-        while os.path.exists(filename):
-            filename = str(uuid.uuid4())
+            if not password_validator.validate():
+                return render_template(
+                    "users/profile.html",
+                    password_error=password_validator.error(),
+                    **data
+                )
 
-        filename += '.' + get_extension(avatar_form.image.data.filename)
+            current_user.set_password(change_password_form.new_password.data)
 
-        if current_user.avatar:
-            os.remove(os.path.join(settings.IMAGES_DIR, current_user.avatar))
+        if change_description_form.validate_on_submit():
+            data_changed = True
+            current_user.description = change_description_form.description.data
 
-        current_user.avatar = filename
-        avatar_form.image.data.save(os.path.join(settings.IMAGES_DIR, filename))
+        if data_changed:
+            session.add(current_user)
+            session.commit()
 
-    if change_password_form.validate_on_submit():
+        change_description_form.description.data = current_user.description
 
-        data_changed = True
-
-        if not current_user.check_password(change_password_form.password.data):
-            return render_template(
-                "users/profile.html",
-                password_error="Указан неверный текущий пароль",
-                **data
-            )
-
-        password_validator = PasswordValidator(
-            password=change_password_form.new_password.data
-        )
-
-        if not password_validator.validate():
-            return render_template(
-                "users/profile.html", password_error=password_validator.error(), **data
-            )
-
-        current_user.set_password(change_password_form.new_password.data)
-
-    if change_description_form.validate_on_submit():
-        data_changed = True
-        current_user.description = change_description_form.description.data
-
-    if data_changed:
-        session = create_session().object_session(current_user)
-        session.add(current_user)
-        session.commit()
-
-    change_description_form.description.data = current_user.description
-
-    return render_template("users/profile.html", **data)
+        return render_template("users/profile.html", **data)
 
 
 @login_manager.user_loader
@@ -153,3 +154,17 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+@blueprint.route("/users/<int:pk>")
+@login_required
+def user_info(pk):
+    with create_session() as session:
+        user = session.query(User).filter(User.id == pk).first()
+
+        if user is None:
+            abort(404)
+
+        data = {"user": user}
+
+    return render_template("users/user_info.html", **data)

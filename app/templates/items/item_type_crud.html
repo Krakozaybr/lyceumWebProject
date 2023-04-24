@@ -1,0 +1,41 @@
+{% extends 'form_base.html' %}
+{% import 'items/item_type_fields.html' as fields %}
+
+{% block form_content %}
+
+    {% if form_delete %}
+        <h2>Редактирование типа предмета</h2>
+    {% else %}
+        <h2>Создание типа предмета</h2>
+    {% endif %}
+
+    <a href="/item_types" class="btn btn-secondary my-2">Назад</a>
+    {% if image_url %}
+        <img src="{{ image_url }}" width="200" height="200" class="align-top d-block" alt="">
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+
+        {{ form.hidden_tag() }}
+        {{ fields.item_type_fields(form) }}
+
+    </form>
+    {% if form.id %}
+        <button class='btn btn-danger mt-2' type='submit' id='delete_submit'>Удалить</button>
+        <script>
+            const btn = $("#delete_submit")
+            btn.on('click', () => {
+                $.ajax({
+                    url: '/api/delete_item/{{ form.id.data }}',
+                    method: 'DELETE',
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify({}),
+                    success: data => {
+                        window.location.href = '/item_types';
+                    },
+                })
+            })
+        </script>
+    {% endif %}
+{% endblock %}

@@ -1,11 +1,11 @@
-{% extends 'users/auth_base.html' %}
+{% extends 'form_base.html' %}
 {% import 'macroses.html' as utils %}
 
 {% block title %}
     Профиль
 {% endblock %}
 
-{% block auth_content %}
+{% block form_content %}
     <h2 class="mb-5">Профиль</h2>
     <div class="d-flex flex-row">
         <img src="{{ current_user.img_url }}" width="200" height="200" class="d-inline-block align-top" alt="">

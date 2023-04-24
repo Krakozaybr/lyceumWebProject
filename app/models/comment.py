@@ -1,20 +1,22 @@
-from sqlalchemy import Integer, String, Column, orm, ForeignKey
+import datetime
 
-from .core import Serializable
+from sqlalchemy import Integer, String, Column, orm, ForeignKey, DateTime
+
+from .abstract import Model
 from .db_session import SqlAlchemyBase
 
 
-class Comment(SqlAlchemyBase, Serializable):
+class Comment(Model, SqlAlchemyBase):
     __tablename__ = "comments"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     target_id = Column(Integer, ForeignKey("products.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     text = Column(String)
-    stars = Column(Integer)
+    date = Column(DateTime, default=datetime.datetime.now)
 
-    user = orm.relationship("User", back_populates="comments")
-    target = orm.relationship("Product", back_populates="comments")
+    user = orm.relationship("User", backref="comments")
+    target = orm.relationship("Product", backref="comments")
 
     def to_json(self):
         return {
@@ -22,5 +24,4 @@ class Comment(SqlAlchemyBase, Serializable):
             "target_id": self.target_id,
             "user": self.user.to_json(),
             "text": self.text,
-            "stars": self.stars,
         }
