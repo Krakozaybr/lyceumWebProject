@@ -1,9 +1,11 @@
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-from sqlalchemy.orm import Session
-import sqlalchemy.ext.declarative as dec
 import logging as log
-import weakref
+
+import sqlalchemy as sa
+import sqlalchemy.ext.declarative as dec
+import sqlalchemy.orm as orm
+from sqlalchemy.orm import Session, scoped_session
+
+from app.settings import DB_FILE
 
 SqlAlchemyBase = dec.declarative_base()
 
@@ -18,7 +20,7 @@ class CarefulSession(orm.Session):
             # Remove the object from the other session, but keep
             # a reference so we can reinstate it.
             object_session.expunge(object_)
-            object_._prev_session = weakref.ref(object_session)
+            object_session.close()
         return super().add(object_)
 
 
@@ -35,7 +37,7 @@ def global_init(db_file):
     log.info(f"Подключение к базе данных по адресу {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
-    __factory = orm.sessionmaker(engine, class_=CarefulSession)
+    __factory = scoped_session(orm.sessionmaker(engine, class_=CarefulSession))
 
     @sa.event.listens_for(__factory, "after_commit")
     def receive_after_commit(session):
@@ -50,11 +52,11 @@ def global_init(db_file):
                 prev_session.add(object_)
                 delattr(object_, "_prev_session")
 
-    from . import __all_models
-
     SqlAlchemyBase.metadata.create_all(engine)
 
 
 def create_session() -> Session:
     global __factory
+    if __factory is None:
+        global_init(DB_FILE)
     return __factory()
