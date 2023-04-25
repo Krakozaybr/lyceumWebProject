@@ -42,7 +42,7 @@
                         {% endif %}
                     </td>
                     <td class="{% if transaction.to_user_id == current_user.id and transaction.money > 0 %}text-danger{% else %}text-success{% endif %}">
-                        {{ transaction.money }}₽
+                        {{ transaction.money|abs }}₽
                     </td>
                     <td><a href="{{ transaction.url }}" class="btn btn-info">Подробнее</a></td>
                 </tr>
